@@ -16,34 +16,32 @@ class SuggestionGenerator:
         """Generate suggestions for improving a specific clause"""
         try:
             prompt = f"""
-            Based on the risk analysis of this contract clause, provide specific suggestions for improvement:
-            
+            Based on the risk analysis of this contract clause from the perspective of our company, Hari and Winston Associates LLC, provide specific suggestions for improvement that will protect our interests.
+
             Clause Type: {clause_type}
-            Risk Level: {clause_analysis['risk_level']}
+            Risk Level to Us: {clause_analysis['risk_level']}
             Risk Score: {clause_analysis['risk_score']:.2f}
-            Compliance Status: {clause_analysis['compliance_status']}
             
             Current Clause Text:
             {clause_text}
             
             Risk Flags: {', '.join(clause_analysis.get('flags', []))}
             
-            Business Context:
-            - We provide data analytics, ML deployment, and dashboard development services
-            - We work on fixed-fee contracts with milestone payments
-            - We need to protect our IP while allowing client data usage
-            - We require clear scope definition to avoid scope creep
+            Our Business Context (Hari and Winston Associates LLC):
+            - We provide data analytics, ML deployment, and dashboard development services.
+            - We need to protect our IP, limit our liability, and ensure we get paid on time.
+            - We require clear scope definition to avoid scope creep.
             
-            Provide suggestions in JSON format:
+            Provide suggestions in JSON format to reduce risk for Hari and Winston Associates LLC:
             {{
                 "suggestions": [
                     {{
                         "priority": "HIGH|MEDIUM|LOW",
                         "category": "liability|payment|scope|ip|termination|other",
-                        "issue": "description of the issue",
-                        "suggestion": "specific suggestion for improvement",
-                        "alternative_wording": "suggested alternative clause text (if applicable)",
-                        "rationale": "why this change would reduce risk"
+                        "issue": "description of the issue for our company",
+                        "suggestion": "specific suggestion to make the clause neutral or in our favor",
+                        "alternative_wording": "suggested alternative clause text that benefits us (if applicable)",
+                        "rationale": "why this change would reduce our risk"
                     }}
                 ]
             }}
@@ -52,7 +50,7 @@ class SuggestionGenerator:
             response = self.client.chat.completions.create(
                 model=settings.AZURE_OPENAI_DEPLOYMENT_NAME,
                 messages=[
-                    {"role": "system", "content": "You are a legal advisor specializing in technology services contracts. Provide practical, actionable suggestions."},
+                    {"role": "system", "content": "You are a legal advisor for Hari and Winston Associates LLC. Provide actionable suggestions to improve our contracts."},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.2,
@@ -68,25 +66,22 @@ class SuggestionGenerator:
     def generate_contract_level_suggestions(self, contract_analysis: Dict[str, Any], clauses: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Generate contract-level improvement suggestions"""
         try:
-            # Analyze overall contract structure
             high_risk_clauses = [c for c in clauses if c.get('risk_level') == 'HIGH']
             missing_clauses = self._identify_missing_clauses(clauses)
             
             prompt = f"""
-            Provide contract-level suggestions for this technology services agreement:
+            Provide contract-level suggestions for this technology services agreement to make it more favorable for our company, Hari and Winston Associates LLC.
+
+            Overall Risk Score to Us: {contract_analysis.get('overall_risk_score', 0):.2f}
+            Overall Risk Level to Us: {contract_analysis.get('risk_level', 'UNKNOWN')}
             
-            Overall Risk Score: {contract_analysis.get('overall_risk_score', 0):.2f}
-            Overall Risk Level: {contract_analysis.get('risk_level', 'UNKNOWN')}
+            High Risk Clauses (for us): {len(high_risk_clauses)}
+            Potentially Missing Clauses (to protect us): {', '.join(missing_clauses)}
             
-            High Risk Clauses: {len(high_risk_clauses)}
-            Potentially Missing Clauses: {', '.join(missing_clauses)}
-            
-            Business Requirements:
-            - Data analytics and ML services
-            - Dashboard development (Power BI, Tableau)
-            - Fixed-fee milestone-based contracts
-            - IP protection while allowing anonymized data use
-            - Clear deliverables and timelines
+            Our Business Requirements (Hari and Winston Associates LLC):
+            - Data analytics and ML services on fixed-fee contracts.
+            - We need strong IP protection, limited liability, and clear payment terms.
+            - We must avoid vague scopes of work.
             
             Provide contract-level suggestions in JSON format:
             {{
@@ -94,17 +89,9 @@ class SuggestionGenerator:
                     {{
                         "priority": "HIGH|MEDIUM|LOW",
                         "category": "structure|missing_clauses|risk_mitigation|compliance",
-                        "issue": "description of the structural issue",
-                        "suggestion": "specific recommendation",
-                        "impact": "how this would improve the contract"
-                    }}
-                ],
-                "missing_clauses": [
-                    {{
-                        "clause_type": "type of missing clause",
-                        "importance": "HIGH|MEDIUM|LOW",
-                        "suggested_content": "what should be included",
-                        "rationale": "why this clause is needed"
+                        "issue": "description of the structural issue that harms us",
+                        "suggestion": "specific recommendation to benefit us",
+                        "impact": "how this would improve the contract for our company"
                     }}
                 ]
             }}
@@ -113,7 +100,7 @@ class SuggestionGenerator:
             response = self.client.chat.completions.create(
                 model=settings.AZURE_OPENAI_DEPLOYMENT_NAME,
                 messages=[
-                    {"role": "system", "content": "You are a contract specialist for technology services companies. Focus on practical business protection."},
+                    {"role": "system", "content": "You are a contract specialist for Hari and Winston Associates LLC. Focus on practical business protection."},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.2,
@@ -121,20 +108,8 @@ class SuggestionGenerator:
             )
             
             suggestions_data = json.loads(response.choices[0].message.content)
-            
-            # Combine structural and missing clause suggestions
-            all_suggestions = suggestions_data.get('structural_suggestions', [])
-            for missing in suggestions_data.get('missing_clauses', []):
-                all_suggestions.append({
-                    "priority": missing['importance'],
-                    "category": "missing_clause",
-                    "issue": f"Missing {missing['clause_type']} clause",
-                    "suggestion": missing['suggested_content'],
-                    "alternative_wording": "",
-                    "rationale": missing['rationale']
-                })
-            
-            return all_suggestions
+            return suggestions_data.get('structural_suggestions', [])
+
         except Exception as e:
             logging.error(f"Error generating contract suggestions: {e}")
             return self._get_default_contract_suggestions()

@@ -46,40 +46,35 @@ class RiskScorer:
         """Get AI-powered risk analysis for a clause"""
         try:
             prompt = f"""
-            Analyze the following contract clause for potential risks and issues:
-            
+            Analyze the following contract clause for potential risks and issues from the perspective of "Hari and Winston Associates LLC". Our company provides data analytics, ML deployment, and dashboard development services. The contract should protect our interests.
+
             Clause Type: {clause_type}
             Clause Text: {clause_text}
-            
-            Consider these business requirements:
+
+            Evaluate the clause based on how it impacts Hari and Winston Associates LLC. Is it neutral, in our favor, or does it pose a risk to us?
+
+            Consider these business requirements for Hari and Winston Associates LLC:
             - Services: Data analytics, ML deployment, dashboard development
-            - Deliverables: Custom dashboards, technical documentation, monthly reports
             - Business model: Fixed-fee contracts with milestone payments
-            
-            Evaluate based on:
-            1. Completeness: Coverage of key legal and operational clauses
-            2. Compliance: Alignment with organizational standards
-            3. Risk Exposure: Potential liabilities
-            4. Clarity & Consistency: Ambiguous or conflicting terms
-            5. Cost/Benefit Balance: Financial terms fairness
-            
+            - Key Protections: Limited liability, clear IP ownership, and defined scope to prevent scope creep.
+
             Respond in JSON format with:
             {{
                 "completeness_score": 0.0-1.0,
                 "compliance_score": 0.0-1.0,
-                "risk_exposure": 0.0-1.0,
+                "risk_exposure": 0.0-1.0,  // Higher score means more risk to Hari and Winston Associates LLC
                 "clarity_score": 0.0-1.0,
                 "cost_benefit_score": 0.0-1.0,
-                "issues": ["list of identified issues"],
-                "concerns": ["list of concerns"],
-                "recommendations": ["list of recommendations"]
+                "issues": ["list of identified issues posing a risk to us"],
+                "concerns": ["list of concerns for our company"],
+                "recommendations": ["list of recommendations to protect our interests"]
             }}
             """
             
             response = self.client.chat.completions.create(
                 model=settings.AZURE_OPENAI_DEPLOYMENT_NAME,
                 messages=[
-                    {"role": "system", "content": "You are a legal contract analyst specializing in technology services agreements."},
+                    {"role": "system", "content": "You are a legal contract analyst working for Hari and Winston Associates LLC. Your goal is to identify risks to the company."},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.1,

@@ -1,0 +1,97 @@
+
+
+### **CONSULTING SERVICES AGREEMENT**
+
+This Consulting Services Agreement (the "Agreement") is made and entered into as of this **15th** day of **September**, 20**25** (the "Effective Date"), by and between:
+
+**The Consultant:** **Hari and Winston Associates LLC**, a limited liability company, with its principal place of business at **1209 Orange Street, Wilmington, DE 19801, USA** ("Consultant").
+
+**The Client:** **ABC LLC**, a limited liability company, with its principal place of business at **456 Innovation Drive, Suite 200, Austin, TX 78701, USA** ("Client").
+
+---
+
+## 1. Scope of Services
+
+Consultant agrees to provide professional services (the "Services") as described in **Exhibit A**. Consultant reserves the right to determine the method, details, and means of performing the Services. The Client agrees that the Consultant may, at its sole discretion, modify, amend, or expand the scope of Services if deemed necessary for the successful completion of the project, with any such changes in scope being subject to additional fees as determined by the Consultant. The Client agrees that the Consultant’s interpretation of the project requirements shall be final.
+
+---
+
+## 2. Compensation and Payment
+
+**Fees:** Client agrees to pay Consultant a non-refundable retainer of **$15,000** upon execution of this Agreement. Services will be billed at a rate of **$350 per hour**. A minimum of **20** hours will be billed monthly, regardless of the hours worked.
+
+**Payment Terms:** All invoices are due and payable within **seven (7) calendar days** of receipt.
+
+**Late Payment:** Any amounts not paid when due will incur a late fee of **5% per month**, compounded monthly, or the highest rate permitted by law, whichever is lower. Furthermore, Consultant shall have the right to **immediately suspend all Services** without notice until the outstanding balance, including all accrued late fees, is paid in full.
+
+**Non-Refundable:** All fees, retainers, and expenses paid to the Consultant are **non-refundable** under any and all circumstances, including but not limited to the early termination of this Agreement for any reason.
+
+---
+
+## 3. Term and Termination
+
+**Term:** This Agreement shall commence on the Effective Date and shall automatically renew for successive one (1) year periods unless the Client provides written notice of non-renewal at least **ninety (90) days** prior to the end of the current term.
+
+**Termination by Consultant:** Consultant may terminate this Agreement:
+* **For any reason**, upon providing seven (7) days' written notice to the Client.
+* **Immediately**, without notice, if the Client breaches any term of this Agreement, fails to make a payment when due, or, in the Consultant's sole judgment, becomes uncooperative.
+
+**Termination by Client:** The Client may not terminate this Agreement for convenience. Termination is only permissible in the event of a material breach by the Consultant that remains uncured for sixty (60) days after the Consultant receives detailed written notice of such breach from the Client.
+
+---
+
+## 4. Intellectual Property Rights
+
+All materials, concepts, work product, software, designs, methodologies, and any other intellectual property created, developed, or provided by the Consultant in connection with the Services, whether preliminary or final (collectively, the "Work Product"), shall be the **sole and exclusive property of Hari and Winston Associates LLC**. Upon full and final payment of all outstanding invoices, the Client is granted a limited, non-exclusive, non-transferable, and revocable license to use the final deliverables for its internal business purposes only. The Consultant retains the right to use any and all Work Product for any purpose, including for other clients.
+
+---
+
+## 5. Limitation of Liability and Disclaimer of Warranties
+
+**Disclaimer:** THE SERVICES AND WORK PRODUCT ARE PROVIDED **"AS-IS"** WITHOUT ANY WARRANTIES OF ANY KIND, EITHER EXPRESS, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. CONSULTANT DOES NOT WARRANT THAT THE SERVICES WILL BE ERROR-FREE OR PRODUCE ANY SPECIFIC RESULTS.
+
+**Limitation of Liability:** IN NO EVENT SHALL HARI AND WINSTON ASSOCIATES LLC, ITS MEMBERS, EMPLOYEES, OR AGENTS BE LIABLE FOR ANY LOST PROFITS OR ANY INDIRECT, CONSEQUENTIAL, INCIDENTAL, SPECIAL, PUNITIVE, OR EXEMPLARY DAMAGES WHATSOEVER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. THE CONSULTANT'S ENTIRE AND CUMULATIVE LIABILITY TO THE CLIENT FOR ANY AND ALL CLAIMS ARISING OUT OF OR IN CONNECTION WITH THIS AGREEMENT SHALL BE STRICTLY LIMITED TO THE TOTAL AMOUNT OF FEES PAID BY THE CLIENT TO THE CONSULTANT IN THE **ONE (1) MONTH** IMMEDIATELY PRECEDING THE EVENT GIVING RISE TO THE CLAIM.
+
+---
+
+## 6. Indemnification
+
+The Client shall indemnify, defend, and hold harmless Hari and Winston Associates LLC, its officers, members, employees, and agents from and against any and all claims, demands, losses, damages, liabilities, costs, and expenses (including, without limitation, **full reimbursement of attorney's fees and legal costs**) arising out of or in any way connected with the Services, the Client's business operations, the Client's use of the Work Product, or any breach of this Agreement by the Client. This obligation shall survive the termination of this Agreement.
+
+---
+
+## 7. Non-Solicitation
+
+During the term of this Agreement and for a period of **twenty-four (24) months** immediately following its termination for any reason, the Client agrees not to, directly or indirectly, solicit, hire, or engage any employee, contractor, or former employee of Hari and Winston Associates LLC who was involved in providing the Services. In the event of a breach of this clause, the Client agrees to pay the Consultant, as liquidated damages, a sum equal to **200% of the solicited individual's annual compensation**.
+
+---
+
+## 8. General Provisions
+
+**Governing Law and Jurisdiction:** This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware, USA, without regard to its conflict of laws principles. The exclusive venue for any dispute resolution shall be **binding arbitration** in Wilmington, Delaware.
+
+**Attorney's Fees:** The prevailing party in any dispute arising from this Agreement shall be entitled to recover its reasonable attorney's fees and costs from the non-prevailing party.
+
+**Entire Agreement:** This Agreement and its Exhibits constitute the entire agreement between the parties and supersede all prior oral or written agreements or understandings.
+
+**Assignment:** The Client may not assign this Agreement without the prior express written consent of the Consultant. The Consultant may freely assign this Agreement at its sole discretion.
+
+**IN WITNESS WHEREOF,** the parties have executed this Agreement as of the Effective Date.
+
+**Hari and Winston Associates LLC**
+
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+(Signature)
+
+Name: **Priya Sharma**
+
+Title: **Managing Partner**
+
+**ABC LLC**
+
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+(Signature)
+
+Name: **John Davis**
+
+Title: **Chief Executive Officer**
