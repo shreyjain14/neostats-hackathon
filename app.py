@@ -28,6 +28,12 @@ if 'chat_history' not in st.session_state:
 if 'suggestions' not in st.session_state:
     st.session_state.suggestions = {}
 
+# --- New Callback Function for Clearing Chat ---
+def clear_chat_history():
+    """Resets the chat history in the session state and backend."""
+    st.session_state.chat_history = []
+    contract_chatbot.clear_history()
+
 def main():
     """Main application function"""
     st.title("🔍 Contract Risk Analysis Platform")
@@ -231,14 +237,17 @@ def risk_dashboard_page():
                     priority_color = {'HIGH': '🔴', 'MEDIUM': '🟡', 'LOW': '🟢'}
                     with st.expander(f"{priority_color.get(suggestion.get('priority'), '⚪')} {suggestion.get('priority')} - {suggestion.get('issue', 'N/A')}"):
                         st.write(f"**Suggestion:** {suggestion.get('suggestion', 'No suggestion provided.')}")
-                        # --- THIS IS THE FIX ---
                         st.write(f"**Rationale:** {suggestion.get('rationale', 'No rationale provided.')}")
 
 def chatbot_page():
     """Contract chatbot page"""
     st.header("💬 Contract Chatbot")
     st.markdown("Ask questions about your contracts, get explanations, and receive advice.")
+
+    # --- Add the clear chat button to the sidebar ---
+    st.sidebar.button("🗑️ Clear Chat History", on_click=clear_chat_history, use_container_width=True, help="Click to start a new conversation")
     
+    # Contract context selector
     if st.session_state.contracts:
         contract_options = {None: "General Questions"}
         contract_options.update({cid: details['filename'] for cid, details in st.session_state.contracts.items()})
@@ -247,10 +256,12 @@ def chatbot_page():
         selected_contract_id = None
         st.info("Upload a contract to enable contract-specific chat context.")
     
+    # Display chat history
     for message in st.session_state.chat_history:
         with st.chat_message(message['role']):
             st.write(message['content'])
     
+    # Handle user input
     if user_input := st.chat_input("Ask about your contract..."):
         st.session_state.chat_history.append({'role': 'user', 'content': user_input})
         st.chat_message("user").write(user_input)
