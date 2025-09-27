@@ -64,29 +64,41 @@ class ContractParser:
         elif filename.endswith('.docx'):
             return self.extract_text_from_docx(file)
         elif filename.endswith('.txt'):
-            return str(file.read(), "utf-8")
+            return file.read().decode("utf-8")
         else:
             raise ValueError("Unsupported file format")
     
     def split_into_clauses(self, text: str) -> List[Dict[str, Any]]:
-        """Split contract text into individual clauses"""
-        # Split by common clause separators
-        clause_separators = [
-            r'\n\s*\d+\.',  # Numbered clauses
-            r'\n\s*[A-Z]\.',  # Lettered clauses
-            r'\n\s*\([a-z]\)',  # Sub-clauses
-            r'\n\s*Article\s+\d+',  # Articles
-            r'\n\s*Section\s+\d+'  # Sections
-        ]
-        
-        # Combine all separators
-        pattern = '|'.join(clause_separators)
-        clauses_raw = re.split(pattern, text, flags=re.IGNORECASE)
-        
+        """Split contract text into individual clauses with improved logic."""
         clauses = []
+        
+        # Primary method: Split by common clause headings (e.g., "1. ...", "A. ...", "Article 1 ...")
+        # This regex looks for a line break, optional whitespace, a number/letter, a period, and then a space.
+        pattern = r'\n\s*(\d+\.|\([a-zA-Z]\)|[A-Z]\.)\s+'
+        clauses_raw = re.split(pattern, text)
+        
+        # Post-process the split to combine the delimiter with the clause text
+        if len(clauses_raw) > 1:
+            processed_clauses = []
+            # Skip the first element if it's empty (often happens with re.split)
+            it = iter(clauses_raw[1:])
+            for delimiter in it:
+                try:
+                    content = next(it)
+                    processed_clauses.append(delimiter.strip() + " " + content.strip())
+                except StopIteration:
+                    break
+            clauses_raw = processed_clauses
+
+        # Fallback method for plain text: Split by double newlines (paragraphs)
+        if len(clauses_raw) <= 1:
+            clauses_raw = text.split('\n\n')
+
+        # Final processing and classification
         for i, clause_text in enumerate(clauses_raw):
             clause_text = clause_text.strip()
-            if len(clause_text) > 50:  # Filter out very short clauses
+            # Filter out very short, likely irrelevant parts
+            if len(clause_text.split()) > 10: 
                 clause_type = self.classify_clause(clause_text)
                 clauses.append({
                     "id": i,
@@ -95,6 +107,15 @@ class ContractParser:
                     "word_count": len(clause_text.split())
                 })
         
+        # If still no clauses found, treat the whole document as one 'general' clause.
+        if not clauses:
+            clauses.append({
+                "id": 0,
+                "text": text.strip(),
+                "type": "general",
+                "word_count": len(text.strip().split())
+            })
+            
         return clauses
     
     def classify_clause(self, clause_text: str) -> str:
@@ -107,33 +128,5 @@ class ContractParser:
                     return clause_type
         
         return "general"
-    
-    def extract_key_terms(self, text: str) -> Dict[str, List[str]]:
-        """Extract key terms and entities from contract"""
-        key_terms = {
-            "dates": [],
-            "amounts": [],
-            "parties": [],
-            "locations": []
-        }
-        
-        # Extract dates
-        date_patterns = [
-            r'\b\d{1,2}/\d{1,2}/\d{4}\b',
-            r'\b\d{1,2}-\d{1,2}-\d{4}\b',
-            r'\b\w+ \d{1,2}, \d{4}\b'
-        ]
-        for pattern in date_patterns:
-            key_terms["dates"].extend(re.findall(pattern, text))
-        
-        # Extract monetary amounts
-        amount_pattern = r'\$[\d,]+(?:\.\d{2})?'
-        key_terms["amounts"] = re.findall(amount_pattern, text)
-        
-        # Extract potential party names (capitalized phrases)
-        party_pattern = r'\b[A-Z][a-z]+(?: [A-Z][a-z]+)*(?:,? (?:Inc|LLC|Corp|Ltd|Company)\.?)?'
-        key_terms["parties"] = list(set(re.findall(party_pattern, text)))
-        
-        return key_terms
 
 contract_parser = ContractParser()

@@ -1,10 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 from datetime import datetime
-import io
-import json
 
 # Backend imports
 from backend.parser import contract_parser
@@ -36,7 +33,6 @@ def main():
     st.title("🔍 Contract Risk Analysis Platform")
     st.markdown("Analyze contracts for risk, compliance, and improvement opportunities")
     
-    # Sidebar navigation - Changed from selectbox to radio
     st.sidebar.title("Navigation")
     page = st.sidebar.radio(
         "Go to:",
@@ -77,12 +73,10 @@ def upload_page():
 def analyze_contract(uploaded_file):
     """Core analysis function, saves results to session state."""
     try:
-        # Step 1: Parsing
         contract_text = contract_parser.extract_text(uploaded_file, uploaded_file.name)
         clauses = contract_parser.split_into_clauses(contract_text)
         contract_id = db_manager.insert_contract(uploaded_file.name, contract_text)
         
-        # Step 2: Clause-by-clause analysis
         clause_analyses = []
         progress_bar = st.progress(0, text="Analyzing clauses...")
         for i, clause in enumerate(clauses):
@@ -98,11 +92,9 @@ def analyze_contract(uploaded_file):
             })
             progress_bar.progress((i + 1) / len(clauses), text=f"Analyzing clause {i+1}/{len(clauses)}")
         
-        # Step 3: Overall scoring
         overall_risk_score, overall_risk_level = risk_scorer.calculate_overall_contract_score(clause_analyses)
         db_manager.update_contract_risk_score(contract_id, overall_risk_score, overall_risk_level)
         
-        # Step 4: Store results in session state for this session
         st.session_state.contracts[contract_id] = {
             'filename': uploaded_file.name,
             'risk_score': overall_risk_score,
@@ -137,7 +129,7 @@ def view_analysis_page():
         )
 
 def display_analysis_results(contract_id, clause_analyses, overall_risk_score, overall_risk_level):
-    """Displays the detailed analysis results for a selected contract."""
+    """Displays the detailed analysis results for a selected contract, showing ALL clauses."""
     # Overall risk metrics
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -153,18 +145,25 @@ def display_analysis_results(contract_id, clause_analyses, overall_risk_score, o
     
     st.markdown("---")
     
-    # Detailed clause analysis
-    st.subheader("Detailed Clause Analysis")
-    st.info("Expand the sections below to see details and get improvement suggestions for high and medium risk clauses.")
+    # Detailed clause analysis - showing ALL clauses now
+    st.subheader("Complete Clause Analysis")
+    
+    # Define colors for expander headers
+    risk_colors = {"HIGH": "🔴", "MEDIUM": "🟡", "LOW": "🟢"}
     
     for clause in clause_analyses:
-        if clause['risk_level'] in ['HIGH', 'MEDIUM']:
-            with st.expander(f"**{clause['clause_type'].replace('_', ' ').title()}** - `{clause['risk_level']}` Risk"):
-                col1, col2 = st.columns([2, 1])
-                with col1:
-                    st.write("**Clause Text:**")
-                    st.text_area("Clause Text", clause['clause_text'], height=150, disabled=True, key=f"text_{contract_id}_{clause['clause_id']}")
-                    
+        # The filter `if clause['risk_level'] in ['HIGH', 'MEDIUM']:` has been REMOVED.
+        risk_emoji = risk_colors.get(clause['risk_level'], '⚪')
+        expander_title = f"{risk_emoji} **{clause['clause_type'].replace('_', ' ').title()}** - `{clause['risk_level']}` Risk"
+        
+        with st.expander(expander_title):
+            col1, col2 = st.columns([2, 1])
+            with col1:
+                st.write("**Clause Text:**")
+                st.text_area("Clause Text", clause['clause_text'], height=150, disabled=True, key=f"text_{contract_id}_{clause['clause_id']}")
+                
+                # Only show issues and flags for medium/high risk clauses to avoid clutter
+                if clause['risk_level'] in ['HIGH', 'MEDIUM']:
                     st.write("**Identified Issues:**")
                     for issue in clause['analysis'].get('issues', []):
                         st.write(f"• {issue}")
@@ -173,13 +172,16 @@ def display_analysis_results(contract_id, clause_analyses, overall_risk_score, o
                         st.write("**Risk Flags:**")
                         for flag in clause['flags']:
                             st.write(f"🚩 `{flag.replace('_', ' ').title()}`")
-                
-                with col2:
-                    st.metric("Risk Score", f"{clause['risk_score']:.2f}")
-                    st.metric("Compliance", clause['compliance_status'])
-                    
-                    clause_id_key = f"{contract_id}_{clause['clause_id']}"
+                else:
+                    st.success("This clause presents a low risk to Hari and Winston Associates LLC.")
 
+            with col2:
+                st.metric("Risk Score", f"{clause['risk_score']:.2f}")
+                st.metric("Compliance", clause['compliance_status'])
+                
+                # Allow suggestions only for medium/high risk clauses
+                if clause['risk_level'] in ['HIGH', 'MEDIUM']:
+                    clause_id_key = f"{contract_id}_{clause['clause_id']}"
                     if clause_id_key not in st.session_state.suggestions:
                         if st.button("💡 Get Suggestions", key=f"suggest_{clause_id_key}"):
                             with st.spinner("Generating suggestions..."):
@@ -201,8 +203,6 @@ def display_analysis_results(contract_id, clause_analyses, overall_risk_score, o
                             del st.session_state.suggestions[clause_id_key]
                             st.rerun()
 
-# --- The rest of your page functions (risk_dashboard_page, chatbot_page, etc.) remain unchanged ---
-
 def risk_dashboard_page():
     """Risk dashboard and analytics page"""
     st.header("📈 Risk Dashboard")
@@ -211,7 +211,6 @@ def risk_dashboard_page():
         st.info("No contracts analyzed yet. Upload a contract to see the dashboard.")
         return
     
-    # Contract selector
     contract_options = {cid: details['filename'] for cid, details in st.session_state.contracts.items()}
     selected_contract_id = st.selectbox(
         "Select Contract:",
@@ -234,7 +233,8 @@ def risk_dashboard_page():
         
         col1, col2 = st.columns(2)
         with col1:
-            risk_counts = pd.Series([c['risk_level'] for c in contract_data['clauses']]).value_counts()
+            df_clauses = pd.DataFrame(contract_data['clauses'])
+            risk_counts = df_clauses['risk_level'].value_counts()
             fig_pie = px.pie(
                 values=risk_counts.values, names=risk_counts.index, title="Risk Level Distribution",
                 color_discrete_map={'LOW': 'green', 'MEDIUM': 'orange', 'HIGH': 'red'}
