@@ -130,7 +130,6 @@ def view_analysis_page():
 
 def display_analysis_results(contract_id, clause_analyses, overall_risk_score, overall_risk_level):
     """Displays the detailed analysis results for a selected contract, showing ALL clauses."""
-    # Overall risk metrics
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("Overall Risk Score", f"{overall_risk_score:.2f}")
@@ -145,14 +144,10 @@ def display_analysis_results(contract_id, clause_analyses, overall_risk_score, o
     
     st.markdown("---")
     
-    # Detailed clause analysis - showing ALL clauses now
     st.subheader("Complete Clause Analysis")
-    
-    # Define colors for expander headers
     risk_colors = {"HIGH": "🔴", "MEDIUM": "🟡", "LOW": "🟢"}
     
     for clause in clause_analyses:
-        # The filter `if clause['risk_level'] in ['HIGH', 'MEDIUM']:` has been REMOVED.
         risk_emoji = risk_colors.get(clause['risk_level'], '⚪')
         expander_title = f"{risk_emoji} **{clause['clause_type'].replace('_', ' ').title()}** - `{clause['risk_level']}` Risk"
         
@@ -161,44 +156,31 @@ def display_analysis_results(contract_id, clause_analyses, overall_risk_score, o
             with col1:
                 st.write("**Clause Text:**")
                 st.text_area("Clause Text", clause['clause_text'], height=150, disabled=True, key=f"text_{contract_id}_{clause['clause_id']}")
-                
-                # Only show issues and flags for medium/high risk clauses to avoid clutter
                 if clause['risk_level'] in ['HIGH', 'MEDIUM']:
                     st.write("**Identified Issues:**")
                     for issue in clause['analysis'].get('issues', []):
                         st.write(f"• {issue}")
-                    
-                    if clause['flags']:
-                        st.write("**Risk Flags:**")
-                        for flag in clause['flags']:
-                            st.write(f"🚩 `{flag.replace('_', ' ').title()}`")
                 else:
                     st.success("This clause presents a low risk to Hari and Winston Associates LLC.")
-
             with col2:
                 st.metric("Risk Score", f"{clause['risk_score']:.2f}")
                 st.metric("Compliance", clause['compliance_status'])
-                
-                # Allow suggestions only for medium/high risk clauses
                 if clause['risk_level'] in ['HIGH', 'MEDIUM']:
                     clause_id_key = f"{contract_id}_{clause['clause_id']}"
                     if clause_id_key not in st.session_state.suggestions:
                         if st.button("💡 Get Suggestions", key=f"suggest_{clause_id_key}"):
                             with st.spinner("Generating suggestions..."):
-                                suggestions = suggestion_generator.generate_clause_suggestions(
-                                    clause, clause['clause_text'], clause['clause_type']
-                                )
+                                suggestions = suggestion_generator.generate_clause_suggestions(clause, clause['clause_text'], clause['clause_type'])
                                 st.session_state.suggestions[clause_id_key] = suggestions
                                 st.rerun()
                     else:
                         suggestions = st.session_state.suggestions[clause_id_key]
                         st.write("**Suggestions:**")
-                        for i, suggestion in enumerate(suggestions[:3], 1):
+                        for suggestion in suggestions[:3]:
                             with st.container(border=True):
-                                st.write(f"**{suggestion['priority']} Priority:** {suggestion['suggestion']}")
+                                st.write(f"**{suggestion.get('priority', 'N/A')} Priority:** {suggestion.get('suggestion', 'N/A')}")
                                 if suggestion.get('alternative_wording'):
                                     st.info(f"**Suggested Wording:** {suggestion['alternative_wording']}")
-                        
                         if st.button("Hide Suggestions", key=f"hide_{clause_id_key}"):
                             del st.session_state.suggestions[clause_id_key]
                             st.rerun()
@@ -212,11 +194,7 @@ def risk_dashboard_page():
         return
     
     contract_options = {cid: details['filename'] for cid, details in st.session_state.contracts.items()}
-    selected_contract_id = st.selectbox(
-        "Select Contract:",
-        options=list(contract_options.keys()),
-        format_func=lambda x: contract_options[x]
-    )
+    selected_contract_id = st.selectbox("Select Contract:", options=list(contract_options.keys()), format_func=lambda x: contract_options[x])
     
     if selected_contract_id:
         contract_data = st.session_state.contracts[selected_contract_id]
@@ -235,16 +213,11 @@ def risk_dashboard_page():
         with col1:
             df_clauses = pd.DataFrame(contract_data['clauses'])
             risk_counts = df_clauses['risk_level'].value_counts()
-            fig_pie = px.pie(
-                values=risk_counts.values, names=risk_counts.index, title="Risk Level Distribution",
-                color_discrete_map={'LOW': 'green', 'MEDIUM': 'orange', 'HIGH': 'red'}
-            )
+            fig_pie = px.pie(values=risk_counts.values, names=risk_counts.index, title="Risk Level Distribution", color_discrete_map={'LOW': 'green', 'MEDIUM': 'orange', 'HIGH': 'red'})
             st.plotly_chart(fig_pie, use_container_width=True)
         with col2:
             df_clauses = pd.DataFrame(contract_data['clauses'])
-            fig_box = px.box(
-                df_clauses, x='clause_type', y='risk_score', title="Risk Score by Clause Type"
-            )
+            fig_box = px.box(df_clauses, x='clause_type', y='risk_score', title="Risk Score by Clause Type")
             fig_box.update_xaxes(tickangle=45)
             st.plotly_chart(fig_box, use_container_width=True)
         
@@ -256,9 +229,10 @@ def risk_dashboard_page():
                 suggestions = suggestion_generator.prioritize_suggestions(suggestions)
                 for suggestion in suggestions:
                     priority_color = {'HIGH': '🔴', 'MEDIUM': '🟡', 'LOW': '🟢'}
-                    with st.expander(f"{priority_color[suggestion['priority']]} {suggestion['priority']} - {suggestion['issue']}"):
-                        st.write(f"**Suggestion:** {suggestion['suggestion']}")
-                        st.write(f"**Rationale:** {suggestion['rationale']}")
+                    with st.expander(f"{priority_color.get(suggestion.get('priority'), '⚪')} {suggestion.get('priority')} - {suggestion.get('issue', 'N/A')}"):
+                        st.write(f"**Suggestion:** {suggestion.get('suggestion', 'No suggestion provided.')}")
+                        # --- THIS IS THE FIX ---
+                        st.write(f"**Rationale:** {suggestion.get('rationale', 'No rationale provided.')}")
 
 def chatbot_page():
     """Contract chatbot page"""
@@ -268,11 +242,7 @@ def chatbot_page():
     if st.session_state.contracts:
         contract_options = {None: "General Questions"}
         contract_options.update({cid: details['filename'] for cid, details in st.session_state.contracts.items()})
-        selected_contract_id = st.selectbox(
-            "Select Contract Context (optional):",
-            options=list(contract_options.keys()),
-            format_func=lambda x: contract_options[x]
-        )
+        selected_contract_id = st.selectbox("Select Contract Context (optional):", options=list(contract_options.keys()), format_func=lambda x: contract_options[x])
     else:
         selected_contract_id = None
         st.info("Upload a contract to enable contract-specific chat context.")
@@ -299,12 +269,7 @@ def contract_library_page():
         st.info("No contracts analyzed in this session. Upload contracts to see them here.")
         return
     
-    contract_data = [
-        {
-            'ID': cid, 'Filename': d['filename'], 'Risk Score': f"{d['risk_score']:.2f}",
-            'Risk Level': d['risk_level'], 'Clauses': len(d['clauses'])
-        } for cid, d in st.session_state.contracts.items()
-    ]
+    contract_data = [{'ID': cid, 'Filename': d['filename'], 'Risk Score': f"{d['risk_score']:.2f}", 'Risk Level': d['risk_level'], 'Clauses': len(d['clauses'])} for cid, d in st.session_state.contracts.items()]
     df = pd.DataFrame(contract_data)
     st.dataframe(df, use_container_width=True)
 

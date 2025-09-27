@@ -91,7 +91,7 @@ class SuggestionGenerator:
                         "category": "structure|missing_clauses|risk_mitigation|compliance",
                         "issue": "description of the structural issue that harms us",
                         "suggestion": "specific recommendation to benefit us",
-                        "impact": "how this would improve the contract for our company"
+                        "rationale": "why this change is important for our company"
                     }}
                 ]
             }}
@@ -130,49 +130,17 @@ class SuggestionGenerator:
     def _get_default_suggestions(self, risk_level: str) -> List[Dict[str, Any]]:
         """Default suggestions when AI generation fails"""
         if risk_level == "HIGH":
-            return [
-                {
-                    "priority": "HIGH",
-                    "category": "other",
-                    "issue": "High risk clause detected",
-                    "suggestion": "Review this clause with legal counsel",
-                    "alternative_wording": "",
-                    "rationale": "High risk clauses require professional review"
-                }
-            ]
+            return [{"priority": "HIGH", "category": "other", "issue": "High risk clause detected", "suggestion": "Review this clause with legal counsel", "alternative_wording": "", "rationale": "High risk clauses require professional review"}]
         else:
-            return [
-                {
-                    "priority": "MEDIUM",
-                    "category": "other",
-                    "issue": "Standard review recommended",
-                    "suggestion": "Consider reviewing clause language for clarity",
-                    "alternative_wording": "",
-                    "rationale": "Clear language reduces misunderstandings"
-                }
-            ]
+            return [{"priority": "MEDIUM", "category": "other", "issue": "Standard review recommended", "suggestion": "Consider reviewing clause language for clarity", "alternative_wording": "", "rationale": "Clear language reduces misunderstandings"}]
     
     def _get_default_contract_suggestions(self) -> List[Dict[str, Any]]:
         """Default contract suggestions when AI generation fails"""
-        return [
-            {
-                "priority": "HIGH",
-                "category": "structure",
-                "issue": "Unable to generate specific suggestions",
-                "suggestion": "Conduct manual contract review with legal team",
-                "alternative_wording": "",
-                "rationale": "Professional review ensures comprehensive risk assessment"
-            }
-        ]
+        return [{"priority": "HIGH", "category": "structure", "issue": "Unable to generate specific suggestions", "suggestion": "Conduct manual contract review with legal team", "alternative_wording": "", "rationale": "Professional review ensures comprehensive risk assessment"}]
     
     def prioritize_suggestions(self, suggestions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Sort suggestions by priority and impact"""
         priority_order = {"HIGH": 3, "MEDIUM": 2, "LOW": 1}
-        
-        return sorted(
-            suggestions,
-            key=lambda x: priority_order.get(x.get('priority', 'LOW'), 1),
-            reverse=True
-        )
+        return sorted(suggestions, key=lambda x: priority_order.get(x.get('priority', 'LOW'), 1), reverse=True)
 
 suggestion_generator = SuggestionGenerator()
